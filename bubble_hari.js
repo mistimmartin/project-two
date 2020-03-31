@@ -25,7 +25,7 @@ const vehiclesTable = new dc.DataTable('.dc-data-table');
 
 
 
-d3.csv('table_export.csv').then(data => {
+d3.csv('table_export_hari.csv').then(data => {
     const dtFormatSpecifier = '%Y';
     const dtFormat = d3.timeFormat(dtFormatSpecifier);
     const dtFormatParser = d3.timeParse(dtFormatSpecifier);
