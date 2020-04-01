@@ -156,7 +156,7 @@ d3.csv('table_export_hari.csv').then(data => {
             p.key,
             `CO2 Change: ${numFormat(p.value.co2Change)}`,
             `CO2 Change in Percentage: ${numFormat(p.value.pctGain)}%`,
-            `Real World CO2 (City): ${numFormat(p.value.co2)}(g/mi)`
+            `Avg Real World CO2 (City): ${numFormat(p.value.avg)}(g/mi)`
         ].join('\n'))
         //#### Customize Axes
 
