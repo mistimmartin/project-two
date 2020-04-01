@@ -41,8 +41,8 @@ d3.csv('table_export_hari.csv').then(data => {
     const cars = crossfilter(data);
     const all = cars.groupAll();
 
-    // var dimensionMfrClass = cars.dimension(d => {return d.Manufacturer + '-' + d.RegulatoryClass});
-    // dimensionMfrClass.filter(d => {return d === 'All-Car'});
+    var dimensionMfrClass = cars.dimension(d => {return d.Manufacturer + '-' + d.RegulatoryClass});
+    dimensionMfrClass.filter(d => {return d === 'All-Car'});
 
     // var yearCount = dimensionMfrClassVehicle.group().reduceCount(function (d) { return d.RealWorldCO2_City; }).all();
     // console.log(yearCount);
@@ -58,10 +58,11 @@ d3.csv('table_export_hari.csv').then(data => {
                 p.co2 = v.RealWorldCO2_City;
                 p.sum += v.RealWorldCO2_City;
                 p.co2Change = v.prevYearCO2_City - v.RealWorldCO2_City;
-                p.avg = p.sum / p.count;
+                p.avg = p.count ? p.sum / p.count : 0;
                 p.pctGain = p.co2Change ? (p.co2Change / p.co2) * 100 : 0;
                 // console.log(p.co2, numFormat(p.co2Change), p.count, p.avg, p.sum, p.pctGain);
             }
+
             return p;
         },
         /* callback for when data is removed from the current filter results */
@@ -71,10 +72,11 @@ d3.csv('table_export_hari.csv').then(data => {
                 p.co2 = v.RealWorldCO2_City;
                 p.sum -= v.RealWorldCO2_City;
                 p.co2Change = v.prevYearCO2_City - v.RealWorldCO2_City;
-                p.avg = p.sum / p.count;
+                p.avg = p.count ? p.sum / p.count : 0;
                 // console.log(p.co2, numFormat(p.co2Change), p.count, p.avg, p.sum);
             }
             // console.log(p.co2, numFormat(p.co2Change), p.count, p.avg, p.sum);
+            console.log(p.avg);
             return p;
         },
         /* initialize p */
@@ -88,7 +90,7 @@ d3.csv('table_export_hari.csv').then(data => {
         })
     )
     console.log(yearlyCityCO2Group.top(10))
-    console.log(yearlyCityCO2Group.top(Number.POSITIVE_INFINITY).length)
+    // console.log(yearlyCityCO2Group.top(Number.POSITIVE_INFINITY).length)
 
     const moveYear = cars.dimension(d => d.mon);
     yearlyCO2BubbleChart /* dc.bubbleChart('#yearly-bubble-chart', 'chartGroup') */
@@ -172,7 +174,7 @@ d3.csv('table_export_hari.csv').then(data => {
         .mouseZoomable(true)
     // Specify a "range chart" to link its brush extent with the zoom of the current "focus chart".
         .rangeChart(yearlyVolumeChart)
-        .x(d3.scaleTime().domain([new Date(1976, 0, 1), new Date(2019, 12, 31)]))
+        .x(d3.scaleTime().domain([new Date(1976, 0, 1), new Date(2019, 11, 31)]))
         .round(d3.timeMonth.round)
         .xUnits(d3.timeMonths)
         .elasticY(true)
@@ -201,13 +203,13 @@ d3.csv('table_export_hari.csv').then(data => {
 
 
     yearlyVolumeChart.width(990) /* dc.barChart('#monthly-volume-chart', 'chartGroup'); */
-        .height(100)
+        .height(40)
         .margins({top: 0, right: 50, bottom: 20, left: 40})
         .dimension(moveYear)
         .group(yearlyCityCO2Group)
         .centerBar(true)
         .gap(1)
-        .x(d3.scaleTime().domain([new Date(1976, 0, 1), new Date(2019, 12, 31)]))
+        .x(d3.scaleTime().domain([new Date(1976, 0, 1), new Date(2019, 11, 31)]))
         .round(d3.timeMonth.round)
         .alwaysUseRounding(true)
         .xUnits(d3.timeMonths);
@@ -225,7 +227,7 @@ d3.csv('table_export_hari.csv').then(data => {
         });
 
     vehiclesTable /* dc.dataTable('.dc-data-table', 'chartGroup') */
-        .dimension(moveYear)
+        .dimension(yearlyCityCO2Dimension) // or moveYear
         // Specify a section function to nest rows of the table
         // .section(d => {
         //     const format = d3.format('02d');
@@ -236,9 +238,8 @@ d3.csv('table_export_hari.csv').then(data => {
         // There are several ways to specify the columns; see the data-table documentation.
         // This code demonstrates generating the column header automatically based on the columns.
         .columns([
-            // Use the `d.date` field; capitalized automatically
             'ModelYear',
-            // Use `d.open`, `d.close`
+            'VehicleType',
             'RealWorldCO2_City',
             'prevYearCO2_City',
             {
@@ -247,8 +248,8 @@ d3.csv('table_export_hari.csv').then(data => {
                 format: function (d) {
                     return numFormat(d.RealWorldCO2_City - d.prevYearCO2_City);
                 }
-            }
-            // Use `d.volume`
+            },
+            'Horsepower'
         ])
 
         // (_optional_) sort using the given field, `default = function(d){return d;}`
