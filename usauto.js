@@ -25,7 +25,7 @@ const vehiclesTable = new dc.DataTable('.dc-data-table');
 
 
 
-d3.csv('table_export_hari.csv').then(data => {
+d3.csv('us_auto_table.csv').then(data => {
     const dtFormatSpecifier = '%Y';
     const dtFormat = d3.timeFormat(dtFormatSpecifier);
     const dtFormatParser = d3.timeParse(dtFormatSpecifier);
@@ -93,6 +93,9 @@ d3.csv('table_export_hari.csv').then(data => {
     // console.log(yearlyCityCO2Group.top(Number.POSITIVE_INFINITY).length)
 
     const moveYear = cars.dimension(d => d.mon);
+
+    const moveYearGroup = moveYear.group().reduceSum(d => d.Horsepower);
+
     const HorsepowerDim  = moveYear.group().reduce(
         (p,v) => {
             ++p.years;
@@ -226,7 +229,7 @@ d3.csv('table_export_hari.csv').then(data => {
         .height(40)
         .margins({top: 0, right: 50, bottom: 20, left: 40})
         .dimension(moveYear)
-        .group(HorsepowerDim)
+        .group(moveYearGroup)
         .centerBar(true)
         .gap(1)
         .x(d3.scaleTime().domain([new Date(1976, 0, 1), new Date(2019, 11, 31)]))
