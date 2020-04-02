@@ -93,6 +93,20 @@ d3.csv('table_export_hari.csv').then(data => {
     // console.log(yearlyCityCO2Group.top(Number.POSITIVE_INFINITY).length)
 
     const moveYear = cars.dimension(d => d.mon);
+    const HorsepowerDim  = moveYear.group().reduce(
+        (p,v) => {
+            ++p.years;
+            p.Horsepower = v.Horsepower;
+            console.log(v.ModelYear + v.Manufacturer + v.RegulatoryClass);
+            console.log(v.Horsepower);
+            return p; },
+        (p,v) => {
+            --p.years;
+            p.Horsepower = v.Horsepower;
+            return p;
+        },
+        () => ({years: 0, Horsepower: 0})
+    );
     yearlyCO2BubbleChart /* dc.bubbleChart('#yearly-bubble-chart', 'chartGroup') */
         // (_optional_) define chart width, `default = 200`
         .width(990)
@@ -166,6 +180,7 @@ d3.csv('table_export_hari.csv').then(data => {
 
     moveChart /* dc.lineChart('#monthly-move-chart', 'chartGroup') */
         .renderArea(true)
+        .renderDataPoints(true)
         .width(990)
         .height(200)
         .transitionDuration(1000)
@@ -187,8 +202,8 @@ d3.csv('table_export_hari.csv').then(data => {
         // Add the base layer of the stack with group. The second parameter specifies a series name for use in the
         // legend.
         // The `.valueAccessor` will be used for the base layer
-        .group(yearlyCityCO2Group, 'Yearly CO2 Emission')
-        .valueAccessor(d => d.value.avg)
+        .group(HorsepowerDim, 'Horsepower by Year')
+        .valueAccessor(d => d.value.Horsepower)
         // Stack additional layers with `.stack`. The first paramenter is a new group.
         // The second parameter is the series name. The third is a value accessor.
         // .stack(monthlyMoveGroup, 'Monthly Index Move', d => d.value)
@@ -200,13 +215,17 @@ d3.csv('table_export_hari.csv').then(data => {
         //     }
         //     return `${dateFormat(d.key)}\n${numberFormat(value)}`;
         // });
+        .title(p => [
+            p.key.getFullYear(),
+            `Average Horsepower: ${numFormat(p.value.Horsepower)}`
+        ].join('\n'))
 
 
     yearlyVolumeChart.width(990) /* dc.barChart('#monthly-volume-chart', 'chartGroup'); */
         .height(40)
         .margins({top: 0, right: 50, bottom: 20, left: 40})
         .dimension(moveYear)
-        .group(yearlyCityCO2Group)
+        .group(HorsepowerDim)
         .centerBar(true)
         .gap(1)
         .x(d3.scaleTime().domain([new Date(1976, 0, 1), new Date(2019, 11, 31)]))
