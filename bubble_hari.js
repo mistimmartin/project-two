@@ -76,7 +76,7 @@ d3.csv('table_export_hari.csv').then(data => {
                 // console.log(p.co2, numFormat(p.co2Change), p.count, p.avg, p.sum);
             }
             // console.log(p.co2, numFormat(p.co2Change), p.count, p.avg, p.sum);
-            console.log(p.avg);
+            // console.log(p.avg);
             return p;
         },
         /* initialize p */
@@ -89,7 +89,7 @@ d3.csv('table_export_hari.csv').then(data => {
             pctGain: 0
         })
     )
-    console.log(yearlyCityCO2Group.top(10))
+    // console.log(yearlyCityCO2Group.top(10))
     // console.log(yearlyCityCO2Group.top(Number.POSITIVE_INFINITY).length)
 
     const moveYear = cars.dimension(d => d.mon);
@@ -97,9 +97,10 @@ d3.csv('table_export_hari.csv').then(data => {
         (p,v) => {
             ++p.years;
             p.Horsepower = v.Horsepower;
-            console.log(v.ModelYear + v.Manufacturer + v.RegulatoryClass);
-            console.log(v.Horsepower);
-            return p; },
+            // console.log(v.ModelYear + v.Manufacturer + v.RegulatoryClass);
+            // console.log(v.Horsepower);
+            return p; 
+        },
         (p,v) => {
             --p.years;
             p.Horsepower = v.Horsepower;
@@ -263,9 +264,9 @@ d3.csv('table_export_hari.csv').then(data => {
             'prevYearCO2_City',
             {
                 // Specify a custom format for column 'Change' by using a label with a function.
-                label: 'Change',
+                label: 'CO2 Change',
                 format: function (d) {
-                    return numFormat(d.RealWorldCO2_City - d.prevYearCO2_City);
+                    return numFormat(d.prevYearCO2_City - d.RealWorldCO2_City);
                 }
             },
             'Horsepower'
